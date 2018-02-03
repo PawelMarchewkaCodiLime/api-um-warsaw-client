@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"time"
 
 	"github.com/kaweue/api-um-warsaw-client/lib/authenticator"
 	"github.com/kaweue/api-um-warsaw-client/lib/client"
@@ -100,6 +101,45 @@ var _ = Describe("Ztm", func() {
 			})
 		})
 
+		Context("when server returns status not ok", func() {
+			JustBeforeEach(func() {
+				handler.result = http.StatusNotFound
+			})
+			It("returns error", func() {
+				_, err := client.GetLinesOnBusStop("5104", "01")
+				Expect(err).ToNot(BeNil())
+			})
+		})
+	})
+
+	Describe("GetTimeTable method", func() {
+		Context("when server returns status ok and correct response", func() {
+			JustBeforeEach(func() {
+				handler.result = http.StatusOK
+				handler.response, _ = ioutil.ReadFile("testData/getTimeTable.json")
+			})
+
+			It("should create correct query", func() {
+				_, err := client.GetTimeTable("5104", "01", "155")
+				Expect(err).To(BeNil())
+				Expect(handler.query.Get("apikey")).To(Equal(apiKey))
+				Expect(handler.query.Get("busstopId")).To(Equal("5104"))
+				Expect(handler.query.Get("busstopNr")).To(Equal("01"))
+				Expect(handler.query.Get("line")).To(Equal("155"))
+				Expect(handler.query.Get("id")).To(Equal(umwarsawclient.TimeTableRequestId))
+			})
+
+			It("should return time table with correct size and content", func() {
+				timeTable, err := client.GetTimeTable("5104", "01", "155")
+				Expect(err).To(BeNil())
+				Expect(timeTable).ToNot(BeNil())
+				Expect(len(timeTable.Record)).To(Equal(52))
+				Expect(timeTable.Record[0].Brigade).To(Equal("1"))
+				Expect(timeTable.Record[0].Direction).To(Equal("rondo Daszyńskiego"))
+				expectedTime, _ := time.Parse("15:04:05", "04:50:00")
+				Expect(timeTable.Record[0].Time).To(Equal(expectedTime))
+			})
+		})
 		Context("when server returns status not ok", func() {
 			JustBeforeEach(func() {
 				handler.result = http.StatusNotFound
