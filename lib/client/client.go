@@ -60,6 +60,7 @@ func (c *Client) executeQuery(query interface{}) (*types.Result, error) {
 	if response.StatusCode != http.StatusOK {
 		return nil, errors.New("Http status = " + response.Status)
 	}
+
 	defer response.Body.Close()
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
