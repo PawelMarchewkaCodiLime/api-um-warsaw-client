@@ -4,7 +4,7 @@ Simple client for Warsaw UM Api. More information is available here https://api.
 
 ### Compilation:
 ```
-go get github.com\kaweue\api-um-warsaw-client
+go get github.com/kaweue/api-um-warsaw-client
 ```
 
 ### Sample usage:
