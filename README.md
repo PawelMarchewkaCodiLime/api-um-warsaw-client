@@ -1,6 +1,6 @@
 # api-um-warsaw-client
 
-Simple client for Warsaw UM Api. More information is available here https://api.um.warszawa.pl/
+Simple client for Warsaw UM Api.
 
 ### Compilation:
 ```
